@@ -69,20 +69,27 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s,s,w,s,w,w,s,w]
 
-def searchAlgorithm(problem, frontier, heuristic=None):
+def searchAlgorithm(problem, fringe, heuristic=None):
     
-   
-    explored_nodes = []       
+    #The Basic Search Algorithm remains same , only the way the fringe is handled changes.
+    #In DFS the fringe is stored as LIFO that is why Stack is implemented
+    #In BFS the fringe is stored as FIFO that is why Queue is implemented
+    
+    #maintain a list of nodes which have been explored, you will need to check this before proceeding
+    explored_nodes = [] 
+    #maintain a list of actions that is to be followed
     actionlist = []  
 
-    if isinstance(frontier, util.Stack) or isinstance(frontier, util.Queue):
-        frontier.push((problem.getStartState(), actionlist))
-    elif isinstance(frontier, util.PriorityQueue):
-        frontier.push((problem.getStartState(), actionlist), heuristic(problem.getStartState(), problem))
+    if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue): 
+        #check for DFS or BFS , DFS maintains a Stack and BFS maintains a Queue 
+        fringe.push((problem.getStartState(), actionlist))
+    elif isinstance(fringe, util.PriorityQueue):
+        #for ucs and acs a Priority Queue works well
+        fringe.push((problem.getStartState(), actionlist), heuristic(problem.getStartState(), problem))
 
-    while frontier :   
+    while fringe :   
 
-        node, actions = frontier.pop()
+        node, actions = fringe.pop()
         
         if not node in explored_nodes:
 
@@ -102,14 +109,14 @@ def searchAlgorithm(problem, frontier, heuristic=None):
                 
                 newAction = actions + [direction]
                
-                if isinstance(frontier, util.Stack) or isinstance(frontier, util.Queue):
+                if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue):
 
-                    frontier.push((coordinate, newAction))
+                    fringe.push((coordinate, newAction))
 
-                elif isinstance(frontier, util.PriorityQueue):
+                elif isinstance(fringe, util.PriorityQueue):
 
                     newCost = problem.getCostOfActions(newAction) + heuristic(coordinate, problem)
-                    frontier.push((coordinate, newAction), newCost)                  
+                    fringe.push((coordinate, newAction), newCost)                  
 
     return []
     
