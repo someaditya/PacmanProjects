@@ -71,9 +71,12 @@ def tinyMazeSearch(problem):
 
 def searchAlgorithm(problem, fringe, heuristic=None):
     
-    #The Basic Search Algorithm remains same , only the way the fringe is handled changes.
+    #The Basic Search Algorithm remains same , only the way the fringe is handled changes. 
+    #Our method needs three elements problem,fringe,heuristic. Heuristic is none except Astar.
     #In DFS the fringe is stored as LIFO that is why Stack is implemented
     #In BFS the fringe is stored as FIFO that is why Queue is implemented
+    #In UCS the fringe is stored as Priority Queue as it implements a least cost method
+    #In Astar the fringe is stored as UCS but with heuristic.Heuristic is passed by the method.
     
     #maintain a list of nodes which have been explored, you will need to check this before proceeding
     explored_nodes = [] 
@@ -84,38 +87,43 @@ def searchAlgorithm(problem, fringe, heuristic=None):
         #check for DFS or BFS , DFS maintains a Stack and BFS maintains a Queue 
         fringe.push((problem.getStartState(), actionlist))
     elif isinstance(fringe, util.PriorityQueue):
-        #for ucs and acs a Priority Queue works well
+        #for ucs and acs a Priority Queue is the solution, but here the heuristic needs to be pushed too
         fringe.push((problem.getStartState(), actionlist), heuristic(problem.getStartState(), problem))
-
+    
+    #check the nodes in the fringe 
     while fringe :   
-
+        
+        #get the node
         node, actions = fringe.pop()
         
+        #check if node is already explored.
         if not node in explored_nodes:
-
+            #add to the list of explored nodes
             explored_nodes.append(node)
-
+            #check if goal is reached
             if problem.isGoalState(node):
-
+            #Succes
                 return actions
-
+            #If its not the goal , get successors
             successors = problem.getSuccessors(node)
-
+            #now iterate the succesors
             for successor in successors:
-
+                #get the coordinates            
                 coordinate = successor[0]
-                
+                #get the directs
                 direction = successor[1]
-                
+                #create new actions 
                 newAction = actions + [direction]
-               
+                
+                #Check if DFS/BFS or UCS/Astar 
                 if isinstance(fringe, util.Stack) or isinstance(fringe, util.Queue):
-
+                    #Push the new Coordinates and new action to the fringe.
                     fringe.push((coordinate, newAction))
 
                 elif isinstance(fringe, util.PriorityQueue):
-
+                    #Calculate the new cost for UCS/Astar using the Heuristic function
                     newCost = problem.getCostOfActions(newAction) + heuristic(coordinate, problem)
+                    #Push the new coordinate,new action,new cost to the fringe
                     fringe.push((coordinate, newAction), newCost)                  
 
     return []
@@ -134,13 +142,16 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-
+    #The Basic Search Algorithm remains same , only the way the fringe is handled changes.
+    #In DFS the fringe is stored as LIFO that is why Stack is implemented
     return searchAlgorithm(problem, util.Stack())
 
 def breadthFirstSearch(problem):
     """
     Search the shallowest nodes in the search tree first.
     """
+    #The Basic Search Algorithm remains same , only the way the fringe is handled changes.
+    #In BFS the fringe is stored as FIFO that is why Queue is implemented
     return searchAlgorithm(problem, util.Queue())
 
 def uniformCostSearch(problem):
